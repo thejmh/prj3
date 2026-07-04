@@ -121,11 +121,23 @@
 
   <script>
   (() => {
-    const COLS = 10, ROWS = 20, CELL = 28;
+    const COLS = 10, ROWS = 20;
+    let CELL = 28;
     const board = document.getElementById('board');
     const ctx = board.getContext('2d');
-    board.width = COLS * CELL;
-    board.height = ROWS * CELL;
+
+    // size the board to fill the browser height (keeping the 10x20 ratio),
+    // clamped so it never overflows the available width.
+    function fit() {
+      const vw = window.innerWidth, vh = window.innerHeight;
+      const isNarrow = vw < 560;
+      const maxH = vh - (isNarrow ? 24 : 40);
+      const maxBoardW = isNarrow ? vw - 32 : vw - 220;
+      CELL = Math.max(16, Math.min(Math.floor(maxH / ROWS), Math.floor(maxBoardW / COLS)));
+      board.width = COLS * CELL;
+      board.height = ROWS * CELL;
+    }
+    fit();
 
     const nextCv = document.getElementById('next');
     const nctx = nextCv.getContext('2d');
@@ -417,6 +429,14 @@
       if (!tmoved && Date.now() - tt < 250) { tryRotate(1); draw(); }
       else if (dy > 90) { hardDrop(); draw(); }
     }, { passive: true });
+
+    // refit on viewport changes
+    window.addEventListener('resize', () => {
+      fit();
+      draw();
+      drawNext();
+      drawHold();
+    });
 
     // initial paint
     grid = Array.from({ length: ROWS }, () => new Array(COLS).fill(null));
