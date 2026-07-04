@@ -14,7 +14,7 @@ Thumbs.db
 
 # Playwright verification artifacts
 .playwright-mcp
-tetris-play.png
+*.png
 
 # Unrelated nested repo (pre-existing)
 testvercel_mh
